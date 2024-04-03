@@ -2,14 +2,16 @@
   "name": "nextjs-dashboard",
   "version": "0.1.0",
   "private": true,
+  "prisma": {
+    "seed": "ts-node --compiler-options {\"module\":\"CommonJS\"} prisma/seed.ts"
+  },
   "scripts": {
     "dev": "next dev",
     "build": "next build",
     "start": "next start",
     "lint": "next lint",
     "studio": "prisma studio",
-    "push": "prisma db push",
-    "generate": "prisma generate"
+    "g": "prisma db push && prisma generate && prisma db seed"
   },
   "dependencies": {
     "@hookform/resolvers": "^3.3.4",
@@ -36,6 +38,7 @@
     "sonner": "^1.4.41",
     "tailwind-merge": "^2.2.2",
     "tailwindcss-animate": "^1.0.7",
+    "ts-node": "^10.9.2",
     "uploadthing": "^6.7.0",
     "zod": "^3.22.4"
   },
