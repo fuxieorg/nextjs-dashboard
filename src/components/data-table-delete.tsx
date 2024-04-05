@@ -1,6 +1,6 @@
 "use client";
 
-import React, { FC, useEffect, useState } from "react";
+import React, { FC, useEffect } from "react";
 import { useFormState } from "react-dom";
 import { toast } from "sonner";
 import {
@@ -19,15 +19,17 @@ import { Button } from "./ui/button";
 interface DataTableDeleteItemsProps {
   action: any;
   children: React.ReactNode;
+  table?: any;
 }
 
 const initialState = {
   message: "",
 };
 
-const DataTableDeleteItems: FC<DataTableDeleteItemsProps> = ({
+const DataTableDelete: FC<DataTableDeleteItemsProps> = ({
   action,
   children,
+  table,
 }) => {
   const [state, formAction] = useFormState(action, initialState);
 
@@ -35,11 +37,12 @@ const DataTableDeleteItems: FC<DataTableDeleteItemsProps> = ({
     if (state) {
       const { message } = state;
       message && toast.success(message);
+      message && table && table.toggleAllPageRowsSelected(false);
     }
   }, [state]);
   return (
     <AlertDialog>
-      <AlertDialogTrigger>{children}</AlertDialogTrigger>
+      <AlertDialogTrigger asChild>{children}</AlertDialogTrigger>
       <AlertDialogContent>
         <AlertDialogHeader>
           <AlertDialogTitle>Are you absolutely sure?</AlertDialogTitle>
@@ -63,4 +66,4 @@ const DataTableDeleteItems: FC<DataTableDeleteItemsProps> = ({
   );
 };
 
-export default DataTableDeleteItems;
+export default DataTableDelete;
