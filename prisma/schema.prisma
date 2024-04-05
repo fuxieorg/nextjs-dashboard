@@ -15,22 +15,49 @@ datasource db {
 }
 
 enum OrderStatus {
-  Approved
-  Pending
-  Rejected
+  pending
+  processing
+  shipped
+  completed
+  returned
+  cancelled
+}
+
+enum payStatus {
+  not_paid
+  paid
+  refunded
 }
 
 model Order {
-  id         Int         @id @default(autoincrement())
-  createdAt  DateTime    @default(now()) @map("created_at")
-  updatedAt  DateTime    @default(now()) @updatedAt @map("updated_at")
-  orderId    String      @unique @map("order_id")
-  amount     Float
-  status     OrderStatus
-  customerId Int         @map("customer_id")
-  customer   Customer    @relation(fields: [customerId], references: [id])
+  id          Int            @id @default(autoincrement())
+  createdAt   DateTime       @default(now()) @map("created_at")
+  updatedAt   DateTime       @default(now()) @updatedAt @map("updated_at")
+  orderSn     String         @unique
+  amount      Float
+  payStatus   payStatus      @default(not_paid)
+  orderStatus OrderStatus    @default(pending)
+  quantity    Int
+  customerId  Int            @map("customer_id")
+  customer    Customer       @relation(fields: [customerId], references: [id])
+  products    OrderProduct[] @relation("OrderToOrderProduct")
 
   @@map("orders")
+}
+
+model OrderProduct {
+  id        Int      @id @default(autoincrement())
+  createdAt DateTime @default(now()) @map("created_at")
+  updatedAt DateTime @default(now()) @updatedAt @map("updated_at")
+  orderId   Int      @map("order_id")
+  order     Order    @relation("OrderToOrderProduct", fields: [orderId], references: [id])
+  productId Int      @map("product_id")
+  product   Product  @relation(fields: [productId], references: [id])
+  title     String
+  price     Decimal  @db.Decimal(8, 2)
+  quantity  Int
+
+  @@map("orderproducts")
 }
 
 model Customer {
@@ -45,4 +72,95 @@ model Customer {
   orders      Order[]
 
   @@map("customers")
+}
+
+enum ProductStatus {
+  active
+  archived
+  draft
+}
+
+model Product {
+  id            Int                @id @default(autoincrement())
+  createdAt     DateTime           @default(now()) @map("created_at")
+  updatedAt     DateTime           @default(now()) @updatedAt @map("updated_at")
+  title         String
+  description   String?
+  price         Decimal            @db.Decimal(8, 2)
+  status        ProductStatus      @default(active)
+  content       String?
+  orderProducts OrderProduct[]
+  image         ImagesOnProducts[]
+
+  @@map("Products")
+}
+
+model Image {
+  id        Int                @id @default(autoincrement())
+  createdAt DateTime           @default(now()) @map("created_at")
+  updatedAt DateTime           @default(now()) @updatedAt @map("updated_at")
+  title     String
+  url       String
+  type      String
+  Product   ImagesOnProducts[]
+
+  @@map("Images")
+}
+
+model ImagesOnProducts {
+  id        Int     @id @default(autoincrement())
+  product   Product @relation(fields: [productId], references: [id])
+  productId Int
+  image     Image   @relation(fields: [imageId], references: [id])
+  imageId   Int
+}
+
+// 以下模型用于 Auth 验证
+model Account {
+  id                String  @id @default(cuid())
+  userId            String  @map("user_id")
+  type              String
+  provider          String
+  providerAccountId String  @map("provider_account_id")
+  refresh_token     String? @db.Text
+  access_token      String? @db.Text
+  expires_at        Int?
+  token_type        String?
+  scope             String?
+  id_token          String? @db.Text
+  session_state     String?
+
+  user User @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@unique([provider, providerAccountId])
+  @@map("accounts")
+}
+
+model Session {
+  id           String   @id @default(cuid())
+  sessionToken String   @unique @map("session_token")
+  userId       String   @map("user_id")
+  expires      DateTime
+  user         User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@map("sessions")
+}
+
+enum UserRole {
+  ADMIN
+  USER
+}
+
+model User {
+  id            String    @id @default(cuid())
+  name          String?
+  email         String?   @unique
+  password      String?
+  role          UserRole  @default(USER)
+  emailVerified DateTime? @map("email_verified")
+  image         String?
+  Account       Account[]
+  Session       Session[]
+
+  @@map("users")
 }
