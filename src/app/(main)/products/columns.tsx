@@ -4,9 +4,18 @@ import { ColumnDef } from "@tanstack/react-table";
 import { Checkbox } from "@/components/ui/checkbox";
 import { DataTableColumnHeader } from "@/components/data-table-column-header";
 import { Product } from "@/types/product";
-import DataTableActions from "@/components/data-table-actions";
 import { removeProducts } from "@/actions/products";
 import Image from "next/image";
+import Link from "next/link";
+import { Button } from "@/components/ui/button";
+import { Edit, Trash2 } from "lucide-react";
+import DataTableDelete from "@/components/data-table-delete";
+import {
+  Tooltip,
+  TooltipContent,
+  TooltipProvider,
+  TooltipTrigger,
+} from "@/components/ui/tooltip";
 
 export const columns: ColumnDef<Product>[] = [
   {
@@ -75,13 +84,55 @@ export const columns: ColumnDef<Product>[] = [
   },
   {
     id: "actions",
+    header: ({ table }) => {
+      const rows = table.getFilteredSelectedRowModel().rows;
+      const ids = rows.map((row) => row.original.id);
+      if (ids.length > 0) {
+        return (
+          <DataTableDelete
+            action={removeProducts.bind(null, ids)}
+            table={table}
+          >
+            <Button variant="destructive" size="sm">
+              Delete all
+            </Button>
+          </DataTableDelete>
+        );
+      }
+      return "Actions";
+    },
     cell: ({ row }) => {
       const product = row.original;
       return (
-        <DataTableActions
-          editLink={`/products/${product.id}`}
-          deleteActions={removeProducts.bind(null, [product.id])}
-        />
+        <div className="flex items-center gap-1">
+          <TooltipProvider>
+            <Tooltip>
+              <TooltipTrigger asChild>
+                <Link href={`/products/${product.id}`}>
+                  <Button size="icon" variant="ghost">
+                    <Edit className="h-4 w-4" />
+                  </Button>
+                </Link>
+              </TooltipTrigger>
+              <TooltipContent>Edit product</TooltipContent>
+            </Tooltip>
+          </TooltipProvider>
+
+          <TooltipProvider>
+            <Tooltip>
+              <TooltipTrigger asChild>
+                <DataTableDelete
+                  action={removeProducts.bind(null, [product.id])}
+                >
+                  <Button size="icon" variant="ghost">
+                    <Trash2 className="h-4 w-4" />
+                  </Button>
+                </DataTableDelete>
+              </TooltipTrigger>
+              <TooltipContent>Delete product</TooltipContent>
+            </Tooltip>
+          </TooltipProvider>
+        </div>
       );
     },
   },

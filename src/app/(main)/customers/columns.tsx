@@ -2,14 +2,20 @@
 
 import { ColumnDef } from "@tanstack/react-table";
 import { Checkbox } from "@/components/ui/checkbox";
-import DataTableActions from "@/components/data-table-actions";
 import { Customer } from "@/types/customer";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { extractNameInitials, formatDate } from "@/lib/utils";
-import DataTableDeleteItems from "@/components/data-table-delete";
 import { removeCustomers } from "@/actions/customers";
 import DataTableDelete from "@/components/data-table-delete";
 import { Button } from "@/components/ui/button";
+import Link from "next/link";
+import { Edit, Trash2 } from "lucide-react";
+import {
+  Tooltip,
+  TooltipContent,
+  TooltipProvider,
+  TooltipTrigger,
+} from "@/components/ui/tooltip";
 
 export const columns: ColumnDef<Customer>[] = [
   {
@@ -70,7 +76,10 @@ export const columns: ColumnDef<Customer>[] = [
       const ids = rows.map((row) => row.original.id);
       if (ids.length > 0) {
         return (
-          <DataTableDelete action={removeCustomers.bind(null, ids)}>
+          <DataTableDelete
+            action={removeCustomers.bind(null, ids)}
+            table={table}
+          >
             <Button variant="destructive" size="sm">
               Delete all
             </Button>
@@ -83,10 +92,35 @@ export const columns: ColumnDef<Customer>[] = [
       const customer = row.original;
 
       return (
-        <DataTableActions
-          editLink={`/customers/${customer.id}`}
-          deleteAction={removeCustomers.bind(null, [customer.id])}
-        />
+        <div className="flex items-center gap-1">
+          <TooltipProvider>
+            <Tooltip>
+              <TooltipTrigger asChild>
+                <Link href={`/customers/${customer.id}`}>
+                  <Button size="icon" variant="ghost">
+                    <Edit className="h-4 w-4" />
+                  </Button>
+                </Link>
+              </TooltipTrigger>
+              <TooltipContent>Edit customer</TooltipContent>
+            </Tooltip>
+          </TooltipProvider>
+
+          <TooltipProvider>
+            <Tooltip>
+              <TooltipTrigger asChild>
+                <DataTableDelete
+                  action={removeCustomers.bind(null, [customer.id])}
+                >
+                  <Button size="icon" variant="ghost">
+                    <Trash2 className="h-4 w-4" />
+                  </Button>
+                </DataTableDelete>
+              </TooltipTrigger>
+              <TooltipContent>Delete customer</TooltipContent>
+            </Tooltip>
+          </TooltipProvider>
+        </div>
       );
     },
   },

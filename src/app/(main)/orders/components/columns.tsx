@@ -2,12 +2,19 @@
 
 import { ColumnDef } from "@tanstack/react-table";
 import { Checkbox } from "@/components/ui/checkbox";
-import DataTableActions from "@/components/data-table-actions";
-import { removeProducts } from "@/actions/products";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { extractNameInitials, formatDate } from "@/lib/utils";
 import { Order } from "@/types/order";
 import { DataTableColumnHeader } from "@/components/data-table-column-header";
+import Link from "next/link";
+import { Button } from "@/components/ui/button";
+import { Eye } from "lucide-react";
+import {
+  Tooltip,
+  TooltipContent,
+  TooltipProvider,
+  TooltipTrigger,
+} from "@/components/ui/tooltip";
 
 export const columns: ColumnDef<Order>[] = [
   {
@@ -88,14 +95,23 @@ export const columns: ColumnDef<Order>[] = [
   },
   {
     id: "actions",
+    header: "Actions",
     cell: ({ row }) => {
-      const customer = row.original;
+      const order = row.original;
 
       return (
-        <DataTableActions
-          editLink={`/orders/${customer.id}`}
-          deleteActions={removeProducts.bind(null, [customer.id])}
-        />
+        <TooltipProvider>
+          <Tooltip>
+            <TooltipTrigger asChild>
+              <Link href={`/orders/${order.id}`}>
+                <Button size="icon" variant="ghost">
+                  <Eye className="h-4 w-4" />
+                </Button>
+              </Link>
+            </TooltipTrigger>
+            <TooltipContent>View order details</TooltipContent>
+          </Tooltip>
+        </TooltipProvider>
       );
     },
   },
