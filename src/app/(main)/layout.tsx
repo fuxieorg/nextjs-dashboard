@@ -13,11 +13,9 @@ export default function MainLayout({ children }: Props) {
       <Sidebar />
       <div className="flex flex-col">
         <Header />
-        <div className="container h-full">
-          <main className="grid h-full flex-1 grid-rows-[auto,1fr] gap-4 p-4 md:p-8 lg:gap-6">
-            {children}
-          </main>
-        </div>
+        <main className="grid h-full flex-1 grid-rows-[auto,1fr] gap-4 p-4 md:p-8 lg:gap-6">
+          {children}
+        </main>
         <Footer />
       </div>
     </div>
