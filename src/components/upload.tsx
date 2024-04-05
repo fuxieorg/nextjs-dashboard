@@ -3,14 +3,27 @@
 import { toast } from "sonner";
 
 import { UploadButton } from "@/lib/uploadthing";
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { ClientUploadedFileData } from "uploadthing/types";
 import Image from "next/image";
+import { addImages } from "@/actions/images";
 
 const Upload = () => {
   const [files, setFiles] = useState<
     ClientUploadedFileData<{ uploadedBy: string }>[]
   >([]);
+  useEffect(() => {
+    const addData =
+      files &&
+      files.map((file) => {
+        return {
+          title: file.name,
+          url: file.url,
+          type: file.type,
+        };
+      });
+    addData && addImages(addData);
+  }, [files]);
   return (
     <>
       <ul className="flex flex-wrap items-center gap-2">
