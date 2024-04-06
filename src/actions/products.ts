@@ -22,6 +22,7 @@ export const updateProduct = async (prevState: any, formData: FormData) => {
       price: Number(formData.get("price"))?.toFixed(2),
       status: formData.get("status"),
       content: formData.get("content"),
+      imageIds: formData.get("imageIds"),
     };
     await updateProductByForm(rawFormData);
     revalidatePath("/");

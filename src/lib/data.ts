@@ -1,5 +1,4 @@
 import prisma from "@/lib/prisma";
-import { Product } from "@/types/product";
 
 export async function getCustomers() {
   return await prisma.customer.findMany({
@@ -93,6 +92,7 @@ interface ProductFormData {
   price: number;
   status: "active" | "draft" | "archived";
   content: string;
+  imageIds: string;
 }
 
 export async function getProducts() {
@@ -115,6 +115,44 @@ export async function updateProductByForm(formData: ProductFormData) {
   });
 
   if (existingProduct) {
+    if (formData.imageIds) {
+      const imagesArr = formData.imageIds
+        .split(",")
+        .map((image) => Number(image));
+
+      await prisma.imagesOnProducts.deleteMany({
+        where: {
+          productId: formData.id,
+          imageId: {
+            notIn: imagesArr,
+          },
+        },
+      });
+
+      const existingImages = await prisma.imagesOnProducts.findMany({
+        where: {
+          productId: formData.id,
+        },
+        select: {
+          imageId: true,
+        },
+      });
+      const existingImageIds = existingImages.map((image) => image.imageId);
+      const imageIdsToAdd = imagesArr.filter(
+        (imageId) => !existingImageIds.includes(imageId),
+      );
+
+      if (imageIdsToAdd.length > 0) {
+        await prisma.imagesOnProducts.createMany({
+          data: imageIdsToAdd.map((imageId) => ({
+            productId: formData.id,
+            imageId,
+          })),
+          skipDuplicates: true,
+        });
+      }
+    }
+
     const updatedProduct = await prisma.product.update({
       where: {
         id: formData.id,
@@ -137,6 +175,18 @@ export async function updateProductByForm(formData: ProductFormData) {
         status: formData.status,
         content: formData.content,
       },
+    });
+    const imagesArr = formData.imageIds
+      .split(",")
+      .map((image) => Number(image))
+      .filter((imageId) => !isNaN(imageId));
+
+    await prisma.imagesOnProducts.createMany({
+      data: imagesArr.map((imageId) => ({
+        productId: createdProduct.id,
+        imageId,
+      })),
+      skipDuplicates: true,
     });
     return { product: createdProduct };
   }
@@ -161,6 +211,17 @@ export async function getProductById(id: number) {
       price: true,
       status: true,
       content: true,
+      image: {
+        select: {
+          image: {
+            select: {
+              id: true,
+              title: true,
+              url: true,
+            },
+          },
+        },
+      },
     },
     where: {
       id: id,
@@ -274,59 +335,4 @@ export async function addOrderByForm(formData: OrderFormData) {
     },
   });
   return { order: createdOrder };
-}
-
-/**
- * image
- *
- **/
-
-export async function getImages() {
-  return await prisma.image.findMany({
-    select: {
-      id: true,
-      title: true,
-      url: true,
-    },
-    orderBy: {
-      createdAt: "desc",
-    },
-  });
-}
-
-interface Images {
-  title: string;
-  url: string;
-  type: string;
-}
-export async function addImageByAction(params: Images[]) {
-  return await prisma.image.createMany({
-    data: [...params],
-  });
-}
-
-export async function deleteImagesById(id: number) {
-  const count = await prisma.imagesOnProducts.count({
-    where: {
-      imageId: id,
-    },
-  });
-  if (count > 0) {
-    return {
-      code: 0,
-      data: {},
-      message: "Images are used elsewhere and cannot be deleted",
-    };
-  }
-
-  await prisma.image.delete({
-    where: {
-      id: id,
-    },
-  });
-  return {
-    code: 1,
-    data: {},
-    message: "Success",
-  };
 }

@@ -3,7 +3,6 @@
 import { zodResolver } from "@hookform/resolvers/zod";
 import { useForm } from "react-hook-form";
 import { z } from "zod";
-import { Button } from "@/components/ui/button";
 import {
   Form,
   FormControl,
@@ -23,14 +22,14 @@ import {
 import { Input } from "@/components/ui/input";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Textarea } from "@/components/ui/textarea";
-import { FC, useEffect } from "react";
+import { FC, useEffect, useState } from "react";
 import { updateProduct } from "@/actions/products";
 import { useFormState } from "react-dom";
 import { toast } from "sonner";
 import FormAlert from "@/components/form-alert";
-import Upload from "@/components/upload";
 import FormActions from "@/components/form-actions";
-import SelectImages from "./add-product/select-products";
+import SelectImages from "../media/select";
+import Image from "next/image";
 
 const formSchema = z.object({
   id: z.number().optional(),
@@ -39,6 +38,7 @@ const formSchema = z.object({
   }),
   description: z.string().optional(),
   // media: z.string().optional(),
+  imageIds: z.string().optional(),
   price: z.string().optional(),
   status: z.enum(["active", "archived", "draft"]).optional(),
   content: z.string().optional(),
@@ -46,6 +46,7 @@ const formSchema = z.object({
 
 interface ProductFormProps {
   initialValues?: any;
+  images: any;
 }
 
 const AddForm: FC<ProductFormProps> = ({
@@ -56,7 +57,9 @@ const AddForm: FC<ProductFormProps> = ({
     price: "",
     status: "active",
     content: "",
+    imageIds: "",
   },
+  images,
 }) => {
   const {
     formState: { isDirty, isValid },
@@ -76,7 +79,24 @@ const AddForm: FC<ProductFormProps> = ({
     message && toast.success(message);
   }, [state]);
 
-  const handleRowSelectionChange = (values: any) => {};
+  const [selectImages, setSelectImages] = useState<any>([]);
+  useEffect(() => {
+    if (initialValues.image) {
+      const initImages = initialValues.image.map((i: any) => {
+        return {
+          id: i.image.id,
+          title: i.image.title,
+          url: i.image.url,
+        };
+      });
+      setSelectImages(initImages);
+      form.setValue("imageIds", initImages.map((i: any) => i.id).join(","));
+    }
+  }, []);
+  const handleRowSelectionChange = (values: number[]) => {
+    setSelectImages(images.filter((image: any) => values.includes(image.id)));
+    form.setValue("imageIds", values.join(","));
+  };
 
   return (
     <Form {...form}>
@@ -93,6 +113,18 @@ const AddForm: FC<ProductFormProps> = ({
                   <FormField
                     control={form.control}
                     name="id"
+                    render={({ field }) => (
+                      <FormItem>
+                        <FormControl>
+                          <Input placeholder="shadcn" {...field} />
+                        </FormControl>
+                        <FormMessage />
+                      </FormItem>
+                    )}
+                  />
+                  <FormField
+                    control={form.control}
+                    name="imageIds"
                     render={({ field }) => (
                       <FormItem>
                         <FormControl>
@@ -164,8 +196,24 @@ const AddForm: FC<ProductFormProps> = ({
                 <CardTitle>Media</CardTitle>
               </CardHeader>
               <CardContent className="grid grid-cols-1 gap-6">
-                {/* <Upload /> */}
-                <SelectImages onRowSelectionChange={handleRowSelectionChange} />
+                <ul className="flex flex-wrap items-center gap-2">
+                  {selectImages?.map((file: any) => (
+                    <li key={file.id}>
+                      <Image
+                        src={file.url}
+                        alt={file.title}
+                        width={100}
+                        height={100}
+                      />
+                    </li>
+                  ))}
+                </ul>
+                <SelectImages
+                  images={images}
+                  onRowSelectionChange={(imageIds: number[]) => {
+                    handleRowSelectionChange(imageIds);
+                  }}
+                />
               </CardContent>
             </Card>
             <Card>
