@@ -9,7 +9,7 @@ import {
 import { cn } from "@/lib/utils";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
-import { Home, Package, ShoppingCart, Users } from "lucide-react";
+import { Home, Images, Package, ShoppingCart, Users } from "lucide-react";
 import { useEffect, useState } from "react";
 
 const navs = [
@@ -86,6 +86,29 @@ const navs = [
         title: "Add Customer",
         slug: "add-customer",
         url: "/customers/add-customer",
+        children: [],
+      },
+    ],
+  },
+  {
+    id: 5,
+    title: "Media",
+    slug: "media",
+    url: "/media",
+    icon: Images,
+    children: [
+      {
+        id: 1,
+        title: "List",
+        slug: "media",
+        url: "/media",
+        children: [],
+      },
+      {
+        id: 2,
+        title: "Add Media",
+        slug: "add-media",
+        url: "/media/add-media",
         children: [],
       },
     ],

@@ -5,8 +5,8 @@ import { toast } from "sonner";
 import { UploadButton } from "@/lib/uploadthing";
 import { useEffect, useState } from "react";
 import { ClientUploadedFileData } from "uploadthing/types";
-import Image from "next/image";
-import { addImages } from "@/actions/images";
+import { addImages } from "@/app/(main)/media/actions";
+import { Plus } from "lucide-react";
 
 const Upload = () => {
   const [files, setFiles] = useState<
@@ -25,33 +25,30 @@ const Upload = () => {
     addData && addImages(addData);
   }, [files]);
   return (
-    <>
-      <ul className="flex flex-wrap items-center gap-2">
-        {files.map((file) => (
-          <li key={file.key}>
-            <Image src={file.url} alt={file.name} width={100} height={100} />
-          </li>
-        ))}
-      </ul>
-      <div>
-        <UploadButton
-          className="text-sm ut-button:bg-primary ut-button:text-primary-foreground ut-button:transition-colors ut-button:hover:bg-primary/90 ut-button:ut-readying:bg-primary/50"
-          endpoint="imageUploader"
-          onClientUploadComplete={(
-            res: ClientUploadedFileData<{ uploadedBy: string }>[],
-          ) => {
-            // Do something with the response
-            console.log("Files: ", res);
-            setFiles(res);
-            toast.success("Upload Completed");
-          }}
-          onUploadError={(error: Error) => {
-            // Do something with the error.
-            toast.error(error.message);
-          }}
-        />
-      </div>
-    </>
+    <UploadButton
+      content={{
+        button() {
+          return <Plus className="h-4 w-4" />;
+        },
+        allowedContent() {
+          return "";
+        },
+      }}
+      className="ut-label:h-full! ut-button:flex ut-button:w-full ut-button:items-center ut-button:justify-center ut-button:bg-transparent ut-button:hover:bg-transparent ut-label:w-full"
+      endpoint="imageUploader"
+      onClientUploadComplete={(
+        res: ClientUploadedFileData<{ uploadedBy: string }>[],
+      ) => {
+        // Do something with the response
+        console.log("Files: ", res);
+        setFiles(res);
+        toast.success("Upload Completed");
+      }}
+      onUploadError={(error: Error) => {
+        // Do something with the error.
+        toast.error(error.message);
+      }}
+    />
   );
 };
 
