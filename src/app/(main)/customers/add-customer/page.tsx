@@ -1,4 +1,4 @@
-import Form from "../form";
+import Form from "../components/form";
 import PageHeader from "@/components/page-header";
 
 export default function Page() {

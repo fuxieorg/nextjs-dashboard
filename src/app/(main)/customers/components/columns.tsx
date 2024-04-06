@@ -2,10 +2,8 @@
 
 import { ColumnDef } from "@tanstack/react-table";
 import { Checkbox } from "@/components/ui/checkbox";
-import { Customer } from "@/types/customer";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { extractNameInitials, formatDate } from "@/lib/utils";
-import { removeCustomers } from "@/actions/customers";
 import DataTableDelete from "@/components/data-table-delete";
 import { Button } from "@/components/ui/button";
 import Link from "next/link";
@@ -16,6 +14,8 @@ import {
   TooltipProvider,
   TooltipTrigger,
 } from "@/components/ui/tooltip";
+import { removeCustomersAction } from "../actions";
+import { Customer } from "../customer";
 
 export const columns: ColumnDef<Customer>[] = [
   {
@@ -77,7 +77,7 @@ export const columns: ColumnDef<Customer>[] = [
       if (ids.length > 0) {
         return (
           <DataTableDelete
-            action={removeCustomers.bind(null, ids)}
+            action={removeCustomersAction.bind(null, ids)}
             table={table}
           >
             <Button variant="destructive" size="sm">
@@ -110,7 +110,7 @@ export const columns: ColumnDef<Customer>[] = [
             <Tooltip>
               <TooltipTrigger asChild>
                 <DataTableDelete
-                  action={removeCustomers.bind(null, [customer.id])}
+                  action={removeCustomersAction.bind(null, [customer.id])}
                 >
                   <Button size="icon" variant="ghost">
                     <Trash2 className="h-4 w-4" />

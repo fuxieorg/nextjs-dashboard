@@ -1,13 +1,13 @@
 import { DataTable } from "@/components/data-table";
 import PageHeader from "@/components/page-header";
 import { Button } from "@/components/ui/button";
-import { getCustomers } from "@/lib/data";
 import { PlusCircle } from "lucide-react";
 import Link from "next/link";
-import { columns } from "./columns";
+import { columns } from "./components/columns";
+import { findCustomers } from "./api";
 
 export default async function Page() {
-  const customers = await getCustomers();
+  const customers = await findCustomers();
 
   return (
     <>

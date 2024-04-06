@@ -3,7 +3,6 @@
 import { zodResolver } from "@hookform/resolvers/zod";
 import { useForm } from "react-hook-form";
 import { z } from "zod";
-import { Button } from "@/components/ui/button";
 import {
   Form,
   FormControl,
@@ -15,14 +14,12 @@ import {
 import { Input } from "@/components/ui/input";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { FC, useEffect } from "react";
-import { updateCustomer } from "@/actions/customers";
-import Link from "next/link";
-import { useFormState } from "react-dom";
-import { Alert, AlertDescription, AlertTitle } from "@/components/ui/alert";
-import { BadgeCheck, Check } from "lucide-react";
 import { toast } from "sonner";
 import FormAlert from "@/components/form-alert";
 import FormActions from "@/components/form-actions";
+import { updateCustomerAction } from "../actions";
+import { CustomerFormData } from "../customer";
+import { useFormState } from "react-dom";
 
 const formSchema = z.object({
   id: z.number().optional(),
@@ -33,29 +30,25 @@ const formSchema = z.object({
 });
 
 interface CustomerFormProps {
-  initialValues?: any;
+  initialValues?: CustomerFormData;
 }
 
 const CustomerForm: FC<CustomerFormProps> = ({
   initialValues = {
-    id: undefined,
+    id: 0,
     firstName: "",
     lastName: "",
     email: "",
     phoneNumber: "",
   },
 }) => {
-  // 1. Define your form.
-  const {
-    formState: { isDirty, isValid },
-    ...form
-  } = useForm<z.infer<typeof formSchema>>({
+  const { ...form } = useForm<z.infer<typeof formSchema>>({
     resolver: zodResolver(formSchema),
     mode: "onChange",
     defaultValues: initialValues,
   });
 
-  const [state, formAction] = useFormState(updateCustomer, {
+  const [state, formAction] = useFormState(updateCustomerAction, {
     message: "",
   });
 
@@ -145,7 +138,10 @@ const CustomerForm: FC<CustomerFormProps> = ({
             </CardContent>
           </Card>
         </div>
-        <FormActions isDisabled={!isDirty || !isValid} prevUrl="/customers" />
+        <FormActions
+          isDisabled={!form.formState.isDirty || !form.formState.isValid}
+          prevUrl="/customers"
+        />
       </form>
     </Form>
   );
