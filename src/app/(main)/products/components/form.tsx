@@ -23,54 +23,58 @@ import { Input } from "@/components/ui/input";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Textarea } from "@/components/ui/textarea";
 import { FC, useEffect, useState } from "react";
-import { updateProduct } from "@/actions/products";
 import { useFormState } from "react-dom";
 import { toast } from "sonner";
 import FormAlert from "@/components/form-alert";
 import FormActions from "@/components/form-actions";
-import SelectImages from "../media/select";
+import SelectImages from "../../media/select";
 import Image from "next/image";
+import { updateProductAction } from "../actions";
+import { ProductDetail } from "../product";
+import { Media } from "../../media/Media";
 
 const formSchema = z.object({
   id: z.number().optional(),
-  title: z.string().min(2, {
-    message: "Title must be at least 2 characters.",
-  }),
+  title: z
+    .string()
+    .min(2, {
+      message: "Title must be at least 2 characters.",
+    })
+    .optional(),
   description: z.string().optional(),
-  // media: z.string().optional(),
   imageIds: z.string().optional(),
-  price: z.string().optional(),
+  price: z.union([z.number(), z.string()]).optional(),
   status: z.enum(["active", "archived", "draft"]).optional(),
   content: z.string().optional(),
+  image: z.array(z.any()).optional(),
 });
 
 interface ProductFormProps {
-  initialValues?: any;
-  images: any;
+  initialValues?: ProductDetail;
+  images: Media[];
 }
 
 const AddForm: FC<ProductFormProps> = ({
   initialValues = {
-    id: undefined,
+    id: 0,
     title: "",
     description: "",
-    price: "",
+    price: 0,
     status: "active",
     content: "",
     imageIds: "",
+    image: [],
   },
   images,
 }) => {
-  const {
-    formState: { isDirty, isValid },
-    ...form
-  } = useForm<z.infer<typeof formSchema>>({
+  const { ...form } = useForm<z.infer<typeof formSchema>>({
     resolver: zodResolver(formSchema),
     mode: "onChange",
     defaultValues: initialValues,
   });
+  console.log("status", form.formState.isDirty, form.formState.isValid);
 
-  const [state, formAction] = useFormState(updateProduct, {
+  const [state, formAction] = useFormState(updateProductAction, {
     message: "",
   });
 
@@ -81,7 +85,7 @@ const AddForm: FC<ProductFormProps> = ({
 
   const [selectImages, setSelectImages] = useState<any>([]);
   useEffect(() => {
-    if (initialValues.image) {
+    if (initialValues && initialValues.image) {
       const initImages = initialValues.image.map((i: any) => {
         return {
           id: i.image.id,
@@ -228,7 +232,7 @@ const AddForm: FC<ProductFormProps> = ({
                     <FormItem>
                       <FormLabel>Base Price</FormLabel>
                       <FormControl>
-                        <Input placeholder="0.00" {...field} />
+                        <Input type="number" placeholder="0.00" {...field} />
                       </FormControl>
                       <FormDescription>Set the product price.</FormDescription>
                       <FormMessage />
@@ -237,7 +241,7 @@ const AddForm: FC<ProductFormProps> = ({
                 />
               </CardContent>
             </Card>
-            <Card>
+            {/* <Card>
               <CardHeader>
                 <CardTitle>Inventory</CardTitle>
               </CardHeader>
@@ -259,7 +263,7 @@ const AddForm: FC<ProductFormProps> = ({
                   )}
                 />
               </CardContent>
-            </Card>
+            </Card> */}
           </div>
           <div className="col-span-1 space-y-6">
             <Card>
@@ -296,7 +300,7 @@ const AddForm: FC<ProductFormProps> = ({
                 />
               </CardContent>
             </Card>
-            <Card>
+            {/* <Card>
               <CardHeader>
                 <CardTitle>Details</CardTitle>
               </CardHeader>
@@ -348,10 +352,13 @@ const AddForm: FC<ProductFormProps> = ({
                   )}
                 />
               </CardContent>
-            </Card>
+            </Card> */}
           </div>
         </div>
-        <FormActions isDisabled={!isDirty || !isValid} prevUrl="/products" />
+        <FormActions
+          isDisabled={!form.formState.isDirty || !form.formState.isValid}
+          prevUrl="/products"
+        />
       </form>
     </Form>
   );

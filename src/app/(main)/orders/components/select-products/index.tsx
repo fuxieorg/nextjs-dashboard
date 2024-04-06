@@ -15,7 +15,6 @@ import { columns } from "./columns";
 import { useEffect, useState } from "react";
 import { toast } from "sonner";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
-import { Product } from "@/types/product";
 import { Trash } from "lucide-react";
 import { Input } from "@/components/ui/input";
 import {
@@ -27,6 +26,7 @@ import {
   TableHeader,
   TableRow,
 } from "@/components/ui/table";
+import { Product } from "@/app/(main)/products/product";
 
 interface SelectProductsProps {
   products: any;

@@ -1,13 +1,13 @@
 import PageHeader from "@/components/page-header";
-import { columns } from "./columns";
+import { columns } from "./components/columns";
 import { DataTable } from "@/components/data-table";
-import { getProducts } from "@/lib/data";
 import { Button } from "@/components/ui/button";
 import Link from "next/link";
 import { PlusCircle } from "lucide-react";
+import { findProducts } from "./api";
 
 export default async function Page() {
-  const products = await getProducts();
+  const products = await JSON.parse(JSON.stringify(await findProducts()));
   return (
     <>
       <PageHeader title="Products">

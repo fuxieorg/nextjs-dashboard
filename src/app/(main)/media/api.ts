@@ -7,6 +7,7 @@ export async function findImages() {
       id: true,
       title: true,
       url: true,
+      type: true,
     },
     orderBy: {
       createdAt: "desc",

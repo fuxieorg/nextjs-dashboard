@@ -3,8 +3,7 @@
 import { ColumnDef } from "@tanstack/react-table";
 import { Checkbox } from "@/components/ui/checkbox";
 import { DataTableColumnHeader } from "@/components/data-table-column-header";
-import { Product } from "@/types/product";
-import { removeProducts } from "@/actions/products";
+import { Product } from "@/app/(main)/products/product";
 import Image from "next/image";
 import Link from "next/link";
 import { Button } from "@/components/ui/button";
@@ -16,6 +15,7 @@ import {
   TooltipProvider,
   TooltipTrigger,
 } from "@/components/ui/tooltip";
+import { removeProductsAction } from "../actions";
 
 export const columns: ColumnDef<Product>[] = [
   {
@@ -90,7 +90,7 @@ export const columns: ColumnDef<Product>[] = [
       if (ids.length > 0) {
         return (
           <DataTableDelete
-            action={removeProducts.bind(null, ids)}
+            action={removeProductsAction.bind(null, ids)}
             table={table}
           >
             <Button variant="destructive" size="sm">
@@ -122,7 +122,7 @@ export const columns: ColumnDef<Product>[] = [
             <Tooltip>
               <TooltipTrigger asChild>
                 <DataTableDelete
-                  action={removeProducts.bind(null, [product.id])}
+                  action={removeProductsAction.bind(null, [product.id])}
                 >
                   <Button size="icon" variant="ghost">
                     <Trash2 className="h-4 w-4" />

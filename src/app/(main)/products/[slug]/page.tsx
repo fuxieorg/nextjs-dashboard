@@ -1,12 +1,13 @@
-import AddForm from "../form";
+import AddForm from "../components/form";
 import PageHeader from "@/components/page-header";
-import { getProductById } from "@/lib/data";
 import { findImages } from "../../media/api";
+import { findProduct } from "../api";
+import { Media } from "../../media/Media";
 
 export default async function Page({ params }: { params: { slug: string } }) {
   const { slug } = params;
-  const product = await getProductById(Number(slug));
-  const images = await findImages();
+  const product = await findProduct(Number(slug));
+  const images: Media[] = await findImages();
   return (
     <>
       <PageHeader title="Edit Product" prevLink="/products" />

@@ -1,9 +1,10 @@
 import PageHeader from "@/components/page-header";
-import Form from "../form";
+import Form from "../components/form";
 import { findImages } from "../../media/api";
+import { Media } from "../../media/Media";
 
 export default async function Page() {
-  const images = await findImages();
+  const images: Media[] = await findImages();
   return (
     <>
       <PageHeader title="Add Product" prevLink="/products" />
