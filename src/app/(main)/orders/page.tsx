@@ -4,10 +4,10 @@ import { columns } from "./components/columns";
 import { Button } from "@/components/ui/button";
 import Link from "next/link";
 import { PlusCircle } from "lucide-react";
-import { getOrders } from "@/lib/data";
+import { findOrders } from "./api";
 
 export default async function Page() {
-  const orders = await getOrders();
+  const orders = await JSON.parse(JSON.stringify(await findOrders()));
 
   return (
     <>

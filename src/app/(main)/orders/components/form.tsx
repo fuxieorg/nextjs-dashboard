@@ -3,7 +3,6 @@
 import { zodResolver } from "@hookform/resolvers/zod";
 import { useForm } from "react-hook-form";
 import { z } from "zod";
-import { Button } from "@/components/ui/button";
 import {
   Form,
   FormControl,
@@ -13,12 +12,8 @@ import {
   FormLabel,
   FormMessage,
 } from "@/components/ui/form";
-import { Input } from "@/components/ui/input";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
-import { FC, useEffect, useState } from "react";
-import { useFormState } from "react-dom";
-import { toast } from "sonner";
-import FormAlert from "@/components/form-alert";
+import { FC, useState } from "react";
 import {
   Select,
   SelectContent,
@@ -27,10 +22,10 @@ import {
   SelectValue,
 } from "@/components/ui/select";
 import SelectProducts from "./select-products";
-import { generateOrderSn } from "@/lib/utils";
-import { addOrder } from "@/actions/orders";
-import { setMaxIdleHTTPParsers } from "http";
 import FormActions from "@/components/form-actions";
+import { Product } from "../../products/product";
+import { OrderProduct } from "../order";
+import { addOrderAction } from "../actions";
 
 const productSchema = z.object({
   productId: z.number(),
@@ -49,17 +44,12 @@ const formSchema = z.object({
 });
 
 interface ProductFormProps {
-  initialValues?: any;
-  products: any;
+  products: Product[];
 }
-const orderSn = generateOrderSn();
-const AddForm: FC<ProductFormProps> = ({ initialValues = {}, products }) => {
-  const [selectedProducts, setSelectedProducts] = useState([]);
-  const {
-    formState: { isDirty, isValid },
-    handleSubmit,
-    ...form
-  } = useForm<z.infer<typeof formSchema>>({
+
+const AddForm: FC<ProductFormProps> = ({ products }) => {
+  const [selectedProducts, setSelectedProducts] = useState<OrderProduct[]>([]);
+  const { ...form } = useForm<z.infer<typeof formSchema>>({
     resolver: zodResolver(formSchema),
     mode: "onChange",
     defaultValues: {
@@ -70,19 +60,10 @@ const AddForm: FC<ProductFormProps> = ({ initialValues = {}, products }) => {
     },
   });
 
-  const addOrderWithProducts = addOrder.bind(null, selectedProducts);
-  // const [state, formAction] = useFormState(addOrder, {
-  //   message: "",
-  // });
-
-  // useEffect(() => {
-  //   const { message } = state;
-  //   message && toast.success(message);
-  // }, [state]);
-
-  const handleRowSelectionChange = (values: any) => {
+  const addOrderWithProducts = addOrderAction.bind(null, selectedProducts);
+  const handleRowSelectionChange = (values: Product[]) => {
     setSelectedProducts(
-      values.map((value) => ({
+      values.map((value: Product) => ({
         productId: value.id,
         title: value.title,
         price: value.price,
@@ -90,8 +71,6 @@ const AddForm: FC<ProductFormProps> = ({ initialValues = {}, products }) => {
       })),
     );
   };
-
-  useEffect(() => console.log(selectedProducts), [selectedProducts]);
 
   return (
     <Form {...form}>
@@ -179,7 +158,10 @@ const AddForm: FC<ProductFormProps> = ({ initialValues = {}, products }) => {
             </Card>
           </div>
         </div>
-        <FormActions isDisabled={!isDirty || !isValid} prevUrl="/orders" />
+        <FormActions
+          isDisabled={!form.formState.isDirty || !form.formState.isValid}
+          prevUrl="/orders"
+        />
       </form>
     </Form>
   );

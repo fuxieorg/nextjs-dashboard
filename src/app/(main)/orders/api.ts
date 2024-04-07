@@ -1,11 +1,8 @@
 import prisma from "@/lib/prisma";
-/**
- * order
- *
- **/
+import { Order, OrderDetail, OrderFormData } from "./order";
 
-export async function getOrders() {
-  return await prisma.order.findMany({
+export async function findOrders(): Promise<Order[]> {
+  const orders = await prisma.order.findMany({
     select: {
       id: true,
       orderSn: true,
@@ -26,10 +23,11 @@ export async function getOrders() {
       createdAt: "desc",
     },
   });
+  return JSON.parse(JSON.stringify(orders));
 }
 
-export async function getOrderById(id: number) {
-  return await prisma.order.findUnique({
+export async function findOrder(id: number): Promise<OrderDetail> {
+  const order = await prisma.order.findUnique({
     select: {
       id: true,
       orderSn: true,
@@ -58,32 +56,10 @@ export async function getOrderById(id: number) {
       id: id,
     },
   });
+  return JSON.parse(JSON.stringify(order));
 }
 
-interface OrderFormData {
-  id: number;
-  payStatus: "not_paid" | "paid" | "refunded";
-  orderStatus:
-    | "pending"
-    | "processing"
-    | "shipped"
-    | "completed"
-    | "cancelled"
-    | "returned";
-  orderSn: string;
-  amount: number;
-  quantity: number;
-  customerId: number;
-  products: orderProduct[];
-}
-interface orderProduct {
-  productId: number;
-  title: string;
-  price: number;
-  quantity: number;
-}
-
-export async function addOrderByForm(formData: OrderFormData) {
+export async function createOrder(formData: OrderFormData) {
   const createdOrder = await prisma.order.create({
     data: {
       orderSn: formData.orderSn,

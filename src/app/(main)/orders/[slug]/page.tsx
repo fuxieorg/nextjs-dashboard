@@ -1,4 +1,3 @@
-import Form from "../components/form";
 import PageHeader from "@/components/page-header";
 import {
   Card,
@@ -15,15 +14,13 @@ import {
   TableHeader,
   TableRow,
 } from "@/components/ui/table";
-import { getOrderById } from "@/lib/data";
-import { extractNameInitials, formatDate } from "@/lib/utils";
-import { Avatar, AvatarFallback, AvatarImage } from "@radix-ui/react-avatar";
-import { Badge } from "@/components/ui/badge";
+import { formatDate } from "@/lib/utils";
+import { findOrder } from "../api";
 
 export default async function Page({ params }: { params: { slug: string } }) {
   const { slug } = params;
-  const order = await getOrderById(Number(slug));
-  console.log(order);
+  const order = await findOrder(Number(slug));
+
   return (
     <>
       <PageHeader title="Order Detail" prevLink="/orders" />

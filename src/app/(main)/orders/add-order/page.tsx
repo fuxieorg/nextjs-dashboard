@@ -1,9 +1,9 @@
 import PageHeader from "@/components/page-header";
 import Form from "../components/form";
-import { getProducts } from "@/lib/data";
+import { findProducts } from "../../products/api";
 
 export default async function Page() {
-  const products = await getProducts();
+  const products = await findProducts();
   return (
     <>
       <PageHeader title="Add Order" prevLink="/orders" />
