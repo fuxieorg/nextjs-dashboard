@@ -4,7 +4,6 @@ import { ColumnDef } from "@tanstack/react-table";
 import { Checkbox } from "@/components/ui/checkbox";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { extractNameInitials, formatDate } from "@/lib/utils";
-import { Order } from "@/types/order";
 import { DataTableColumnHeader } from "@/components/data-table-column-header";
 import Link from "next/link";
 import { Button } from "@/components/ui/button";
@@ -15,6 +14,7 @@ import {
   TooltipProvider,
   TooltipTrigger,
 } from "@/components/ui/tooltip";
+import { Order } from "../order";
 
 export const columns: ColumnDef<Order>[] = [
   {
