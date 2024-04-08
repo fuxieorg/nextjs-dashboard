@@ -1,9 +1,9 @@
 "use server";
 import { revalidatePath } from "next/cache";
-import { createImages, deleteImage } from "./api";
-import { Media } from "./Media";
+import { createImages, deleteImages } from "./api";
+import { AddMedia, Media } from "./media";
 
-export const addImages = async (params: Media[]) => {
+export const addImagesAction = async (params: AddMedia[]) => {
   try {
     console.log(params);
     await createImages(params);
@@ -14,9 +14,9 @@ export const addImages = async (params: Media[]) => {
   }
 };
 
-export const removeImage = async (id: number) => {
+export const removeImageAction = async (ids: number[]) => {
   try {
-    await deleteImage(id);
+    await deleteImages(ids);
     revalidatePath("/");
     return { message: "Successfully" };
   } catch (error) {

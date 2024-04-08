@@ -5,8 +5,8 @@ import { toast } from "sonner";
 import { UploadButton } from "@/lib/uploadthing";
 import { useEffect, useState } from "react";
 import { ClientUploadedFileData } from "uploadthing/types";
-import { addImages } from "@/app/(main)/media/actions";
 import { Plus } from "lucide-react";
+import { addImagesAction } from "@/app/(main)/media/actions";
 
 const Upload = () => {
   const [files, setFiles] = useState<
@@ -22,7 +22,7 @@ const Upload = () => {
           type: file.type,
         };
       });
-    addData && addImages(addData);
+    addData && addImagesAction(addData);
   }, [files]);
   return (
     <UploadButton

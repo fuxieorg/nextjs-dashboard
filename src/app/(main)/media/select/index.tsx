@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useState } from "react";
+import { useState } from "react";
 import Image from "next/image";
 import { Button } from "@/components/ui/button";
 import {
@@ -14,17 +14,11 @@ import {
 import Upload from "@/components/upload";
 import { CircleCheck, X } from "lucide-react";
 import { DialogClose } from "@radix-ui/react-dialog";
-import { removeImage } from "@/app/(main)/media/actions";
+import { Media } from "../media";
 
 interface SelectProductsProps {
   onRowSelectionChange: (selectedRows: number[]) => void;
-  images: any;
-}
-
-interface Image {
-  id: number;
-  title: string;
-  url: string;
+  images: Media[];
 }
 
 function SelectImages({ onRowSelectionChange, images }: SelectProductsProps) {
@@ -44,10 +38,6 @@ function SelectImages({ onRowSelectionChange, images }: SelectProductsProps) {
     onRowSelectionChange && onRowSelectionChange(selectedImages);
   };
 
-  const handleDelete = (id: number) => {
-    removeImage(id);
-  };
-
   return (
     <Dialog>
       <DialogTrigger asChild>
@@ -59,7 +49,7 @@ function SelectImages({ onRowSelectionChange, images }: SelectProductsProps) {
         </DialogHeader>
         <div className="grid grid-cols-6 gap-3">
           <Upload />
-          {images?.map((file: Image) => (
+          {images?.map((file: Media) => (
             <div
               key={file.id}
               className="relative flex items-center justify-center rounded border p-1"
@@ -70,15 +60,6 @@ function SelectImages({ onRowSelectionChange, images }: SelectProductsProps) {
                   <CircleCheck className="h-5 w-5 text-green-400" />
                 </div>
               )}
-              <div
-                className="absolute -right-2 -top-2 z-50 flex cursor-pointer items-center justify-center rounded-full border bg-primary-foreground p-0.5"
-                onClick={(e) => {
-                  e.stopPropagation();
-                  handleDelete(file.id);
-                }}
-              >
-                <X className="h-3 w-3 text-primary" />
-              </div>
               <Image src={file.url} alt={file.title} width={100} height={100} />
             </div>
           ))}

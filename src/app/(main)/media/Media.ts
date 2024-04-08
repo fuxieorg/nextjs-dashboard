@@ -4,3 +4,9 @@ export interface Media {
   url: string;
   type: string;
 }
+
+export interface AddMedia {
+  title: string;
+  url: string;
+  type: string;
+}

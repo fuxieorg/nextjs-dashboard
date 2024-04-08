@@ -1,5 +1,5 @@
 import prisma from "@/lib/prisma";
-import { Media } from "./Media";
+import { AddMedia, Media } from "./media";
 
 export async function findImages() {
   return await prisma.image.findMany({
@@ -15,16 +15,18 @@ export async function findImages() {
   });
 }
 
-export async function createImages(params: Media[]) {
+export async function createImages(params: AddMedia[]) {
   return await prisma.image.createMany({
     data: [...params],
   });
 }
 
-export async function deleteImage(id: number) {
+export async function deleteImages(ids: number[]) {
   const count = await prisma.imagesOnProducts.count({
     where: {
-      imageId: id,
+      imageId: {
+        in: ids,
+      },
     },
   });
   if (count > 0) {
@@ -35,9 +37,11 @@ export async function deleteImage(id: number) {
     };
   }
 
-  await prisma.image.delete({
+  await prisma.image.deleteMany({
     where: {
-      id: id,
+      id: {
+        in: ids,
+      },
     },
   });
   return {

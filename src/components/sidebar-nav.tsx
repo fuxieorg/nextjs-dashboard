@@ -96,22 +96,7 @@ const navs = [
     slug: "media",
     url: "/media",
     icon: Images,
-    children: [
-      {
-        id: 1,
-        title: "List",
-        slug: "media",
-        url: "/media",
-        children: [],
-      },
-      {
-        id: 2,
-        title: "Add Media",
-        slug: "add-media",
-        url: "/media/add-media",
-        children: [],
-      },
-    ],
+    children: [],
   },
 ];
 export default function SidebarNav() {
