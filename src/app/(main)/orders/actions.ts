@@ -2,7 +2,7 @@
 import { generateOrderSn } from "@/lib/utils";
 import { revalidatePath } from "next/cache";
 import { createOrder } from "./api";
-import { OrderFormData, OrderProduct } from "./order";
+import { OrderFormData, OrderProduct, OrderSubmitData } from "./order";
 
 const calculateTotals = (products: any) => {
   const totals = products.reduce(
@@ -16,17 +16,14 @@ const calculateTotals = (products: any) => {
   return totals;
 };
 
-export const addOrderAction = async (
-  products: OrderProduct[],
-  formData: FormData,
-) => {
+export const addOrderAction = async (formData: OrderSubmitData) => {
   try {
     const rawFormData: OrderFormData = {
       orderSn: generateOrderSn(),
-      amount: calculateTotals(products).totalPrice,
-      quantity: calculateTotals(products).totalQuantity,
-      payStatus: formData.get("payStatus") as "not_paid" | "paid" | "refunded",
-      orderStatus: formData.get("orderStatus") as
+      amount: calculateTotals(formData.products).totalPrice,
+      quantity: calculateTotals(formData.products).totalQuantity,
+      payStatus: formData.payStatus as "not_paid" | "paid" | "refunded",
+      orderStatus: formData.orderStatus as
         | "pending"
         | "processing"
         | "shipped"
@@ -34,7 +31,7 @@ export const addOrderAction = async (
         | "cancelled"
         | "returned",
       customerId: 1,
-      products: products,
+      products: formData.products as unknown as OrderProduct[],
     };
     await createOrder(rawFormData);
     revalidatePath("/");

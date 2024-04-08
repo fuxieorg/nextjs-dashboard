@@ -1,7 +1,7 @@
 "use client";
 
 import { zodResolver } from "@hookform/resolvers/zod";
-import { useForm } from "react-hook-form";
+import { Controller, useForm } from "react-hook-form";
 import { z } from "zod";
 import {
   Form,
@@ -24,8 +24,9 @@ import {
 import SelectProducts from "./select-products";
 import FormActions from "@/components/form-actions";
 import { Product } from "../../products/product";
-import { OrderProduct } from "../order";
 import { addOrderAction } from "../actions";
+import FormAlert from "@/components/form-alert";
+import { OrderSubmitData } from "../order";
 
 const productSchema = z.object({
   productId: z.number(),
@@ -35,12 +36,10 @@ const productSchema = z.object({
 });
 
 const formSchema = z.object({
-  amount: z.number().optional(),
-  quantity: z.number().optional(),
-  payStatus: z.enum(["not_paid", "paid", "refunded"]).optional(),
-  orderStatus: z.enum(["pending", "processing"]).optional(),
-  customerId: z.number().optional(),
-  products: z.array(productSchema).optional(),
+  payStatus: z.enum(["not_paid", "paid", "refunded"]),
+  orderStatus: z.enum(["pending", "processing"]),
+  customerId: z.number(),
+  products: z.array(productSchema),
 });
 
 interface ProductFormProps {
@@ -48,7 +47,6 @@ interface ProductFormProps {
 }
 
 const AddForm: FC<ProductFormProps> = ({ products }) => {
-  const [selectedProducts, setSelectedProducts] = useState<OrderProduct[]>([]);
   const { ...form } = useForm<z.infer<typeof formSchema>>({
     resolver: zodResolver(formSchema),
     mode: "onChange",
@@ -60,28 +58,36 @@ const AddForm: FC<ProductFormProps> = ({ products }) => {
     },
   });
 
-  const addOrderWithProducts = addOrderAction.bind(null, selectedProducts);
-  const handleRowSelectionChange = (values: Product[]) => {
-    setSelectedProducts(
-      values.map((value: Product) => ({
-        productId: value.id,
-        title: value.title,
-        price: value.price,
-        quantity: 1,
-      })),
-    );
+  const [submitState, setSubmitState] = useState({ message: "" });
+  const onSubmit = async (formData: OrderSubmitData) => {
+    const result = await addOrderAction(formData);
+    setSubmitState({ message: result.message });
   };
 
   return (
     <Form {...form}>
-      <form action={addOrderWithProducts} className="space-y-8">
-        {/* {state.message && <FormAlert />} */}
+      <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-8">
+        {submitState.message && <FormAlert />}
         <div className="grid grid-cols-3 gap-6">
           <div className="col-span-2 space-y-6">
             <div className="col-span-1 w-full space-y-6">
-              <SelectProducts
-                products={products}
-                onRowSelectionChange={handleRowSelectionChange}
+              <Controller
+                name="products"
+                control={form.control}
+                render={({ field }) => (
+                  <SelectProducts
+                    products={products}
+                    onRowSelectionChange={(values: Product[]) => {
+                      const selected = values.map((value: Product) => ({
+                        productId: value.id,
+                        title: value.title,
+                        price: Number(value.price),
+                        quantity: 1,
+                      }));
+                      field.onChange(selected);
+                    }}
+                  />
+                )}
               />
             </div>
           </div>

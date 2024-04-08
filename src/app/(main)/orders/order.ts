@@ -62,6 +62,19 @@ export interface OrderFormData {
   products: OrderProduct[];
 }
 
+export interface OrderSubmitData {
+  payStatus: "not_paid" | "paid" | "refunded";
+  orderStatus:
+    | "pending"
+    | "processing"
+    | "shipped"
+    | "completed"
+    | "cancelled"
+    | "returned";
+  customerId: number;
+  products: OrderProduct[];
+}
+
 export interface OrderProduct {
   productId: number;
   title: string;
