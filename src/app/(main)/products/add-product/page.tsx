@@ -1,7 +1,7 @@
 import PageHeader from "@/components/page-header";
 import Form from "../components/form";
 import { findImages } from "../../media/api";
-import { Media } from "../../media/Media";
+import { Media } from "../../media/media";
 
 export default async function Page() {
   const images: Media[] = await findImages();

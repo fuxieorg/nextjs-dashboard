@@ -31,7 +31,7 @@ import SelectImages from "../../media/select";
 import Image from "next/image";
 import { updateProductAction } from "../actions";
 import { ProductDetail } from "../product";
-import { Media } from "../../media/Media";
+import { Media } from "../../media/media";
 
 const formSchema = z.object({
   id: z.number(),
