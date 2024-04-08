@@ -34,17 +34,20 @@ import { ProductDetail } from "../product";
 import { Media } from "../../media/Media";
 
 const formSchema = z.object({
-  id: z.number().optional(),
-  title: z
-    .string()
-    .min(2, {
-      message: "Title must be at least 2 characters.",
-    })
-    .optional(),
+  id: z.number(),
+  title: z.string().min(2, {
+    message: "Title must be at least 2 characters.",
+  }),
   description: z.string().optional(),
   imageIds: z.string().optional(),
-  price: z.union([z.number(), z.string()]).optional(),
-  status: z.enum(["active", "archived", "draft"]).optional(),
+  price: z.union([
+    z.number().min(0.01, "Price must be greater than 0."),
+    z.string().refine((value) => {
+      const parsed = parseFloat(value);
+      return !isNaN(parsed) && parsed > 0;
+    }, "Price must be a positive number."),
+  ]),
+  status: z.enum(["active", "archived", "draft"]),
   content: z.string().optional(),
   image: z.array(z.any()).optional(),
 });
@@ -72,7 +75,6 @@ const AddForm: FC<ProductFormProps> = ({
     mode: "onChange",
     defaultValues: initialValues,
   });
-  console.log("status", form.formState.isDirty, form.formState.isValid);
 
   const [state, formAction] = useFormState(updateProductAction, {
     message: "",

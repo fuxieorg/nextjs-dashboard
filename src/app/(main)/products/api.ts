@@ -83,30 +83,41 @@ export async function updateProduct(formData: ProductFormData) {
         content: formData.content,
       },
     });
-    const imagesArr = formData.imageIds
-      .split(",")
-      .map((image) => Number(image))
-      .filter((imageId) => !isNaN(imageId));
+    if (formData.imageIds) {
+      const imagesArr = formData.imageIds
+        .split(",")
+        .map((image) => Number(image))
+        .filter((imageId) => !isNaN(imageId));
 
-    await prisma.imagesOnProducts.createMany({
-      data: imagesArr.map((imageId) => ({
-        productId: createdProduct.id,
-        imageId,
-      })),
-      skipDuplicates: true,
-    });
+      await prisma.imagesOnProducts.createMany({
+        data: imagesArr.map((imageId) => ({
+          productId: createdProduct.id,
+          imageId,
+        })),
+        skipDuplicates: true,
+      });
+    }
     return { product: createdProduct };
   }
 }
 
 export async function deleteProducts(ids: number[]) {
-  return prisma.product.deleteMany({
+  await prisma.product.deleteMany({
     where: {
       id: {
         in: ids,
       },
     },
   });
+
+  await prisma.imagesOnProducts.deleteMany({
+    where: {
+      productId: {
+        in: ids,
+      },
+    },
+  });
+  return { code: 1, message: "success" };
 }
 
 export async function findProduct(id: number): Promise<ProductDetail> {
