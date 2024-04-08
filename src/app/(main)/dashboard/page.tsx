@@ -4,10 +4,10 @@ import DashboardTopSellers from "@/components/dashboard-top-sellers";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { DataTable } from "@/components/data-table";
 import { columns } from "../orders/components/columns";
-import { getOrders } from "@/lib/data";
+import { findOrders } from "../orders/api";
 
 export default async function Page() {
-  const orders = await getOrders();
+  const orders = await findOrders();
   return (
     <>
       <PageHeader title="Dashboard" />
